@@ -28,7 +28,7 @@ const Info = () => {
 
       return r.json();
     })
-    .then(response => setMessage(Object.assign(initialMessage, response.data)))
+    .then(response => setMessage(response))
     .catch((err) => {
       setMessage(initialMessage);
       setError(err.message);
