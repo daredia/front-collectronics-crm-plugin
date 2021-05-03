@@ -20,7 +20,7 @@ const fetchAndValidate = async (url, encodedCredential) => {
   return json;
 };
 
-const getAccounts = async () => {
+const getAccounts = async (ref) => {
   console.log({msg: 'Fetching accounts'});
 
   const username = process.env.COLLECTRONICS_USERNAME;
@@ -28,7 +28,7 @@ const getAccounts = async () => {
   const encodedCredential = base64.encode(`${username}:${pw}`);
 
   const apiHost = 'http://acasstaging7.collectronics.net';
-  const endpoint = `/sampleFrontLookupMethod.action?Ref=XYZ-101`;
+  const endpoint = `/sampleFrontLookupMethod.action?Ref=${ref}`;
   const response = await fetchAndValidate(`${apiHost}${endpoint}`, encodedCredential);
   const {data} = response;
 

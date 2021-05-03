@@ -9,7 +9,8 @@ const Info = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const uri = `/api/search?auth_secret=${secret}`;
+    const ref = 'XYZ-101';
+    const uri = `/api/search?auth_secret=${secret}&ref=${ref}`;
     const initialMessage = {msg: 'Hello world from client.'};
 
     setLoadingState(true);

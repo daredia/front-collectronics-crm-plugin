@@ -21,7 +21,10 @@ app.get('/api/search', async (req, res) => {
   if (AUTH_SECRET && req.query.auth_secret !== AUTH_SECRET)
     return res.sendStatus(401);
 
-  const [err, accounts] = await to(collectronicsDriver.getAccounts());
+  if (!req.query.ref)
+	return res.status(400).send({err: 'Missing ref query parameter'});
+
+  const [err, accounts] = await to(collectronicsDriver.getAccounts(req.query.ref));
   if (err) {
     console.error(err);
 
