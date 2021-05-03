@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
+
+import { FrontLink } from './FrontActions';
 import { useStoreState } from './Store';
 
 const Info = () => {
   const { secret } = useStoreState();
 
   const [isLoading, setLoadingState] = useState(true);
-  const [message, setMessage] = useState({});
+  const [accounts, setAccounts] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const ref = 'XYZ-101';
     const uri = `/api/search?auth_secret=${secret}&ref=${ref}`;
-    const initialMessage = {msg: 'Hello world from client.'};
 
     setLoadingState(true);
     setError(null);
@@ -29,9 +30,9 @@ const Info = () => {
 
       return r.json();
     })
-    .then(response => setMessage(response))
+    .then(response => setAccounts(response.data))
     .catch((err) => {
-      setMessage(initialMessage);
+      setAccounts([]);
       setError(err.message);
     })
     .finally(() => setLoadingState(false));
@@ -43,7 +44,16 @@ const Info = () => {
   if (error)
     return <div className="notice error">{error}</div>;
 
-  return <div className="notice">{JSON.stringify(message, undefined, 2)}</div>;
+  {/*return <pre>{JSON.stringify(accounts, undefined, 2)}</pre>;*/}
+
+  return (
+    <div>
+      <div className="info-card">
+        <div className="info-card-contact">XYZ-101</div>
+        <div className="info-card-link"><FrontLink href='http://collectronics.com' label='View in Collectronics' /></div>
+      </div>
+    </div>
+  )
 };
 
 export default Info;
