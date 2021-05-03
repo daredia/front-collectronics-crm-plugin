@@ -52,6 +52,21 @@ const Info = () => {
         <div className="info-card-contact">XYZ-101</div>
         <div className="info-card-link"><FrontLink href='http://collectronics.com' label='View in Collectronics' /></div>
       </div>
+      <div className="info-contact">
+        { accounts.length ? (
+          <>
+            <div className="data-title">Account</div>
+            <ul className="list-data">
+              {accounts.map((e, idx) => <li key={idx}>
+                <div className="info-entry">
+                  <div className="info-label">Name</div>
+                  <div className="info-value">Christian East</div>
+                </div>
+              </li>)}
+            </ul>
+          </>
+        ) : undefined }
+      </div>
     </div>
   )
 };
