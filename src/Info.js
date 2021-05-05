@@ -7,7 +7,7 @@ const Info = () => {
   const { secret } = useStoreState();
 
   const [isLoading, setLoadingState] = useState(true);
-  const [accounts, setAccounts] = useState([]);
+  const [account, setAccount] = useState({});
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -30,9 +30,17 @@ const Info = () => {
 
       return r.json();
     })
-    .then(response => setAccounts(response.data))
+    .then(response => {
+      const {account, msg} = response.data;
+      if (account) {
+        setAccount(account);
+      } else {
+        setAccount({});
+        setError(msg);
+      }
+    })
     .catch((err) => {
-      setAccounts([]);
+      setAccount({});
       setError(err.message);
     })
     .finally(() => setLoadingState(false));

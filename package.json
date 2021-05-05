@@ -6,6 +6,7 @@
     "@frontapp/plugin-sdk": "^1.0.1",
     "base-64": "^1.0.0",
     "express": "^4.17.1",
+    "jsdom": "^16.5.3",
     "luxon": "^1.24.1",
     "node-env-run": "^4.0.1",
     "node-fetch": "^2.6.1",

@@ -24,7 +24,7 @@ app.get('/api/search', async (req, res) => {
   if (!req.query.ref)
 	return res.status(400).send({err: 'Missing ref query parameter'});
 
-  const [err, accounts] = await to(collectronicsDriver.getAccounts(req.query.ref));
+  const [err, accountData] = await to(collectronicsDriver.getAccountData(req.query.ref));
   if (err) {
     console.error(err);
 
@@ -34,10 +34,7 @@ app.get('/api/search', async (req, res) => {
     return res.status(500).send(err);
   }
 
-  if (!accounts)
-    return res.sendStatus(404);
-
-  res.send({data: accounts});
+  res.send({data: accountData});
 });
 
 app.listen(port, () => console.log(`Server listening on port ${port}`));

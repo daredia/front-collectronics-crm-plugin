@@ -1,4 +1,5 @@
 const base64 = require('base-64');
+const jsdom = require("jsdom");
 const fetch = require('node-fetch');
 
 const fetchAndValidate = async (url, encodedCredential) => {
@@ -20,7 +21,46 @@ const fetchAndValidate = async (url, encodedCredential) => {
   return json;
 };
 
-const getAccounts = async (ref) => {
+const formatAccountData = (responseData) => {
+  if (!responseData.length) {
+    return {
+      msg: 'No account found',
+      account: null,
+    };
+  }
+
+  if (responseData.length > 1) {
+    return {
+      msg: 'Multiple accounts found',
+      account: null,
+    };
+  }
+
+  const account = responseData[0];
+  const dom = new jsdom.JSDOM(account.allianceFileNoHyperLink);
+  const accountLinkNode = dom.window.document.querySelector('a');
+  const name = accountLinkNode.textContent;
+  const url = accountLinkNode.href;
+
+  const contactInfos = account.ownerEmailList.map((email, i) => ({
+    email,
+    name: account.ownerNameList[i],
+    phone: account.ownerPhoneList[i],
+  }));
+
+  return {
+    account: {
+      name,
+      url,
+      contactInfos,
+      associationName: account.associationName,
+      companyName: account.companyName,
+      workflowStage: account.currentWorkFlowStage,
+    }
+  };
+};
+
+const getAccountData = async (ref) => {
   console.log({msg: 'Fetching accounts'});
 
   const username = process.env.COLLECTRONICS_USERNAME;
@@ -32,9 +72,9 @@ const getAccounts = async (ref) => {
   const response = await fetchAndValidate(`${apiHost}${endpoint}`, encodedCredential);
   const {data} = response;
 
-  return data || [];
+  return formatAccountData(data);
 };
 
 module.exports = {
-  getAccounts: getAccounts
+  getAccountData: getAccountData
 };
