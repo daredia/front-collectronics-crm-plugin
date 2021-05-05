@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { FrontLink } from './FrontActions';
+import InfoCard from './InfoCard';
 import { useStoreState } from './Store';
 
 const Info = () => {
@@ -54,22 +55,22 @@ const Info = () => {
 
   return (
     <div>
-      <div className="info-card">
-        <div className="info-card-contact">{account.name}</div>
+      <InfoCard title={account.name} cls="info-card-title">
         <div className="info-card-link"><FrontLink href={account.url} label='View in Collectronics' /></div>
-      </div>
-      <div className="info-card">
-        <div className="data-title">Association</div>
+      </InfoCard>
+
+      <InfoCard title="Association" cls="data-title">
         <div>{account.associationName}</div>
-      </div>
-      <div className="info-card">
-        <div className="data-title">Management Company</div>
+      </InfoCard>
+
+      <InfoCard title="Management Company" cls="data-title">
         <div>{account.companyName}</div>
-      </div>
-      <div className="info-card">
-        <div className="data-title">Workflow Stage</div>
-        <div>{account.workflowStage}</div>
-      </div>
+      </InfoCard>
+
+      <InfoCard title="Workflow Stage" cls="data-title">
+        <div className="info-card-pill">{account.workflowStage}</div>
+      </InfoCard>
+
       {account.contactInfos.map((contact, idx) => (
         <div className="info-contact" key={idx}>
           <div className="data-title">Account</div>
