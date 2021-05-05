@@ -12,14 +12,14 @@ const ContactInfo = ({contact}) => {
   	<div className="info-contact">
   	  <div className="data-title">Account</div>
   	  <ul className="list-data">
-  	  	{entries.map((entry, i) => (
+        {entries.map((entry, i) => entry[1] ? (
   	  	  <li key={i}>
   	  	    <div className="info-entry">
   	  	      <div className="info-label">{entry[0]}</div>
   	  	      <div className="info-value">{entry[1]}</div>
   	  	    </div>
   	  	  </li>
-  	  	))}
+        ) : null)}
   	  </ul>
   	</div>
   );
