@@ -52,6 +52,18 @@ const Info = () => {
         <div className="info-card-contact">XYZ-101</div>
         <div className="info-card-link"><FrontLink href='http://collectronics.com' label='View in Collectronics' /></div>
       </div>
+      <div className="info-card">
+        <div className="data-title">Association</div>
+        <div>Florida Association</div>
+      </div>
+      <div className="info-card">
+        <div className="data-title">Management Company</div>
+        <div>Demo Company</div>
+      </div>
+      <div className="info-card">
+        <div className="data-title">Workflow Stage</div>
+        <div>Payment Plan</div>
+      </div>
       <div className="info-contact">
         { accounts.length ? (
           <>
