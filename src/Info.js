@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
+import ContactInfo from './ContactInfo';
 import { FrontLink } from './FrontActions';
 import InfoCard from './InfoCard';
 import { useStoreState } from './Store';
@@ -71,30 +72,8 @@ const Info = () => {
         <div className="info-card-pill">{account.workflowStage}</div>
       </InfoCard>
 
-      {account.contactInfos.map((contact, idx) => (
-        <div className="info-contact" key={idx}>
-          <div className="data-title">Account</div>
-          <ul className="list-data">
-            <li>
-              <div className="info-entry">
-                <div className="info-label">Name</div>
-                <div className="info-value">{contact.name}</div>
-              </div>
-            </li>
-            <li>
-              <div className="info-entry">
-                <div className="info-label">Phone</div>
-                <div className="info-value">{contact.phone}</div>
-              </div>
-            </li>
-            <li>
-              <div className="info-entry">
-                <div className="info-label">Email</div>
-                <div className="info-value">{contact.email}</div>
-              </div>
-            </li>
-          </ul>
-        </div>)
+      {account.contactInfos.map((contact, idx) =>
+        <ContactInfo contact={contact} key={idx} />
       )}
     </div>
   );
