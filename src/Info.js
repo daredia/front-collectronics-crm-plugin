@@ -9,7 +9,8 @@ const Info = () => {
   const { secret } = useStoreState();
 
   const [isLoading, setLoadingState] = useState(true);
-  const [account, setAccount] = useState({});
+  const [account, setAccount] = useState(null);
+  const [msg, setMsg] = useState('');
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -34,12 +35,8 @@ const Info = () => {
     })
     .then(response => {
       const {account, msg} = response.data;
-      if (account) {
-        setAccount(account);
-      } else {
-        setAccount({});
-        setError(msg);
-      }
+      setAccount(account);
+      setMsg(msg);
     })
     .catch((err) => {
       setAccount({});
@@ -53,6 +50,17 @@ const Info = () => {
 
   if (error)
     return <div className="notice error">{error}</div>;
+
+  if (!account) {
+    const url = 'https://acaslive.collectronics.net/appRWHomePage.jsp';
+    return (
+      <div>
+        <InfoCard title={msg} cls="info-card-title">
+          <div className="info-card-link"><FrontLink href={url} label='Open in Collectronics' /></div>
+        </InfoCard>
+      </div>
+    );
+  }
 
   return (
     <div>

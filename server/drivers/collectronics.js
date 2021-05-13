@@ -22,6 +22,7 @@ const fetchAndValidate = async (url, encodedCredential) => {
 };
 
 const formatAccountData = (responseData) => {
+  // This case does not seem to happen in practice
   if (!responseData.length) {
     return {
       msg: 'No account found',
@@ -29,6 +30,7 @@ const formatAccountData = (responseData) => {
     };
   }
 
+  // This case does not seem to happen in practice
   if (responseData.length > 1) {
     return {
       msg: 'Multiple accounts found',
@@ -37,6 +39,13 @@ const formatAccountData = (responseData) => {
   }
 
   const account = responseData[0];
+  if (!account.allianceFileNoHyperLink) {
+    return {
+      msg: 'No or multiple accounts',
+      account: null,
+    };
+  }
+
   const dom = new jsdom.JSDOM(account.allianceFileNoHyperLink);
   const accountLinkNode = dom.window.document.querySelector('a');
   const name = accountLinkNode.textContent;
