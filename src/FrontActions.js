@@ -11,3 +11,12 @@ export const FrontLink = ({ label, href }) => {
     </a>
   );
 };
+
+export const FrontCompose = ({ label, to }) => {
+  const { frontContext } = useStoreState();
+  const { createDraft } = frontContext;
+
+  return (
+    <button className="front-compose" onClick={() => createDraft({to: [to]})}>{label}</button>
+  );
+};

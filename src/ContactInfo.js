@@ -1,11 +1,13 @@
 import React from 'react';
 
+import { FrontCompose } from './FrontActions';
+
 const ContactInfo = ({contact}) => {
   const {name, phone, email} = contact;
   const entries = [
   	['Name', name],
   	['Phone', phone],
-  	['Email', email],
+    ['Email', <FrontCompose to={email} label={email} />],
   ];
 
   return (
