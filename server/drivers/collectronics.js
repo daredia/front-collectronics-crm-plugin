@@ -82,7 +82,6 @@ const fetchAccountDatas = async (refs, email) => {
 
   const apiHost = 'http://acasstaging7.collectronics.net';
   const endpoint = '/sampleFrontLookupMethod.action';
-  console.log({refs, email});
 
   if (refs?.length) {
     const responseDatas = [];

@@ -38,7 +38,6 @@ const Info = () => {
         }
 
         if (m.content?.type === 'html') {
-          console.log({contentBody: m.content.body});
           const el = document.createElement('div');
           el.innerHTML = m.content.body;
           return el.innerText;
@@ -53,7 +52,7 @@ const Info = () => {
       const {subject} = frontContext.conversation || '';
       const email = frontContext.conversation.recipient?.handle || '';
       const body = await listAllMessagesAndGetBody();
-      console.log({subject, email, body});
+
       const regex = /([A-Z]+[-][0-9]{2,3}(?:-[A-Z]{2})?)/g;
       const subjectRefs = subject.match(regex) || [];
       const bodyRefs = body.match(regex) || [];
@@ -110,7 +109,7 @@ const Info = () => {
     return (
       <div>
         <InfoCard title={msg} cls="info-card-title">
-          <div className="info-card-link"><FrontLink href={url} label='Open in Collectronics' /></div>
+          <div className="info-card-link"><FrontLink href={url} label='Open Collectronics' /></div>
         </InfoCard>
       </div>
     );
