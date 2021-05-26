@@ -21,10 +21,14 @@ app.get('/api/search', async (req, res) => {
   if (AUTH_SECRET && req.query.auth_secret !== AUTH_SECRET)
     return res.sendStatus(401);
 
-  if (!req.query.ref)
-	return res.status(400).send({err: 'Missing ref query parameter'});
+  if (!req.query.email || !(req.query.subjectRefs || req.query.bodyRefs))
+	  return res.status(400).send({err: 'Missing required query parameter(s)'});
 
-  const [err, accountData] = await to(collectronicsDriver.getAccountData(req.query.ref));
+  const subjectRefs = req.query.subjectRefs?.split(',') || [];
+  const bodyRefs = req.query.bodyRefs?.split(',') || [];
+  const email = req.query.email;
+
+  const [err, accountData] = await to(collectronicsDriver.getAccountData(subjectRefs, bodyRefs, email));
   if (err) {
     console.error(err);
 

@@ -2,6 +2,21 @@ const base64 = require('base-64');
 const jsdom = require("jsdom");
 const fetch = require('node-fetch');
 
+const accountDataResponseTypes = {
+  none: {
+    msg: 'No account found',
+    account: null,
+  },
+  multiple: {
+    msg: 'Multiple accounts found',
+    account: null,
+  },
+  noneOrMultiple: {
+    msg: 'No or multiple accounts',
+    account: null,
+  }
+};
+
 const fetchAndValidate = async (url, encodedCredential) => {
   const response = await fetch(url, {
     method: 'GET',
@@ -24,26 +39,17 @@ const fetchAndValidate = async (url, encodedCredential) => {
 const formatAccountData = (responseData) => {
   // This case does not seem to happen in practice
   if (!responseData.length) {
-    return {
-      msg: 'No account found',
-      account: null,
-    };
+    return accountDataResponseTypes.none;
   }
 
   // This case does not seem to happen in practice
   if (responseData.length > 1) {
-    return {
-      msg: 'Multiple accounts found',
-      account: null,
-    };
+    return accountDataResponseTypes.multiple;
   }
 
   const account = responseData[0];
   if (!account.allianceFileNoHyperLink) {
-    return {
-      msg: 'No or multiple accounts',
-      account: null,
-    };
+    return accountDataResponseTypes.noneOrMultiple;
   }
 
   const dom = new jsdom.JSDOM(account.allianceFileNoHyperLink);
@@ -69,19 +75,71 @@ const formatAccountData = (responseData) => {
   };
 };
 
-const getAccountData = async (ref) => {
-  console.log({msg: 'Fetching accounts'});
-
+const fetchAccountDatas = async (refs, email) => {
   const username = process.env.COLLECTRONICS_USERNAME;
   const pw = process.env.COLLECTRONICS_PW;
   const encodedCredential = base64.encode(`${username}:${pw}`);
 
   const apiHost = 'http://acasstaging7.collectronics.net';
-  const endpoint = `/sampleFrontLookupMethod.action?Ref=${ref}`;
-  const response = await fetchAndValidate(`${apiHost}${endpoint}`, encodedCredential);
-  const {data} = response;
+  const endpoint = '/sampleFrontLookupMethod.action';
+  console.log({refs, email});
 
-  return formatAccountData(data);
+  if (refs?.length) {
+    const responseDatas = [];
+    // Note: intentionally firing off requests in sequence (rather than in parallel with Promise.all)
+    // because Collectronics api returns internal server error if sent concurrent requests
+    for (const ref of refs) {
+      const queryString = `Ref=${ref}`;
+      const response = await fetchAndValidate(`${apiHost}${endpoint}?${queryString}`, encodedCredential);
+      responseDatas.push(response.data);
+    };
+
+    const accountDatas = responseDatas.map(data => formatAccountData(data));
+    return accountDatas.filter(data => !!data.account);
+  }
+
+  if (email) {
+    const queryString = `Email=${email}`;
+    const response = await fetchAndValidate(`${apiHost}${endpoint}?${queryString}`, encodedCredential);
+    const accountData = formatAccountData(response.data);
+    return [accountData];
+  }
+
+  return [];
+};
+
+const getAccountData = async (subjectRefs, bodyRefs, email) => {
+  console.log({msg: 'Fetching accounts', subjectRefs, bodyRefs});
+
+  // If exactly 1 account is found from subjectRefs, return it
+  const subjectRefSingleAccountDatas = await fetchAccountDatas(subjectRefs, null);
+  if (subjectRefSingleAccountDatas.length == 1) {
+    return subjectRefSingleAccountDatas[0];
+  }
+
+  // If multiple accounts found, return appropriate message
+  if (subjectRefSingleAccountDatas.length > 1) {
+    return accountDataResponseTypes.multiple;
+  }
+
+  // No accounts found from subjectRefs. If exactly 1 account is found from bodyRefs, return it
+  const bodyRefSingleAccountDatas = await fetchAccountDatas(bodyRefs, null);
+  if (bodyRefSingleAccountDatas.length == 1) {
+    return bodyRefSingleAccountDatas[0];
+  }
+
+  // If multiple accounts found, return appropriate message
+  if (bodyRefSingleAccountDatas.length > 1) {
+    return accountDataResponseTypes.multiple;
+  }
+
+  // No accounts found from refs. Fall back to lookup by email
+  const emailAccountDatas = await fetchAccountDatas(null, email);
+  if (emailAccountDatas.length == 1) {
+    return emailAccountDatas[0];
+  }
+
+  return accountDataResponseTypes.noneOrMultiple;
 };
 
 module.exports = {
