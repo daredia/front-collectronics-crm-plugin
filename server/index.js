@@ -21,7 +21,7 @@ app.get('/api/search', async (req, res) => {
   if (AUTH_SECRET && req.query.auth_secret !== AUTH_SECRET)
     return res.sendStatus(401);
 
-  if (!req.query.email || !(req.query.subjectRefs || req.query.bodyRefs))
+  if (!req.query.email)
 	  return res.status(400).send({err: 'Missing required query parameter(s)'});
 
   const subjectRefs = req.query.subjectRefs?.split(',') || [];
