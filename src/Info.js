@@ -55,16 +55,17 @@ const Info = () => {
       const body = await listAllMessagesAndGetBody();
       console.log({subject, email, body});
       const regex = /([A-Z]+[-][0-9]{2,3}(?:-[A-Z]{2})?)/g;
-      // TODO: make subjectRefs and bodyRefs unique with lodash
       const subjectRefs = subject.match(regex) || [];
       const bodyRefs = body.match(regex) || [];
 
       let uri = `/api/search?auth_secret=${secret}&email=${email}`;
       if (subjectRefs.length) {
-        uri += `&subjectRefs=${subjectRefs}`;
+        const distinctSubjectRefs = [...new Set(subjectRefs)];
+        uri += `&subjectRefs=${distinctSubjectRefs}`;
       }
       if (bodyRefs.length) {
-        uri += `&bodyRefs=${bodyRefs}`;
+        const distinctBodyRefs = [...new Set(bodyRefs)];
+        uri += `&bodyRefs=${distinctBodyRefs}`;
       }
 
       setLoadingState(true);
