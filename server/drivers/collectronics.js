@@ -80,8 +80,7 @@ const fetchAccountDatas = async (refs, email) => {
   const pw = process.env.COLLECTRONICS_PW;
   const encodedCredential = base64.encode(`${username}:${pw}`);
 
-  const apiHost = 'http://acasstaging7.collectronics.net';
-  const endpoint = '/sampleFrontLookupMethod.action';
+  const apiEndpoint = process.env.COLLECTRONICS_API_URL;
 
   if (refs?.length) {
     const responseDatas = [];
@@ -89,7 +88,7 @@ const fetchAccountDatas = async (refs, email) => {
     // because Collectronics api returns internal server error if sent concurrent requests
     for (const ref of refs) {
       const queryString = `Ref=${ref}`;
-      const response = await fetchAndValidate(`${apiHost}${endpoint}?${queryString}`, encodedCredential);
+      const response = await fetchAndValidate(`${apiEndpoint}?${queryString}`, encodedCredential);
       responseDatas.push(response.data);
     };
 
@@ -99,7 +98,7 @@ const fetchAccountDatas = async (refs, email) => {
 
   if (email) {
     const queryString = `Email=${email}`;
-    const response = await fetchAndValidate(`${apiHost}${endpoint}?${queryString}`, encodedCredential);
+    const response = await fetchAndValidate(`${apiEndpoint}?${queryString}`, encodedCredential);
     const accountData = formatAccountData(response.data);
     return [accountData];
   }
