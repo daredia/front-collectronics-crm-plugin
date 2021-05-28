@@ -13,6 +13,8 @@ const Info = () => {
   const [msg, setMsg] = useState('');
   const [error, setError] = useState(null);
 
+  const {conversation} = frontContext;
+
   useEffect(() => {
     if (!frontContext?.conversation) {
       setError('This plugin only works with conversations.');
@@ -49,8 +51,8 @@ const Info = () => {
     }
 
     async function fetchAccount() {
-      const {subject} = frontContext.conversation || '';
-      const email = frontContext.conversation.recipient?.handle || '';
+      const {subject} = conversation || '';
+      const email = conversation.recipient?.handle || '';
       const body = await listAllMessagesAndGetBody();
 
       const regex = /([A-Z]+[-][0-9]{2,3}(?:-[A-Z]{2})?)/g;
@@ -96,7 +98,7 @@ const Info = () => {
     }
 
     fetchAccount();
-  }, [secret, frontContext]);
+  }, [secret, conversation.id]);
 
   if (isLoading)
     return <div className="notice">Loading...</div>;
