@@ -24,8 +24,8 @@ app.get('/api/search', async (req, res) => {
   if (!req.query.email)
 	  return res.status(400).send({err: 'Missing required query parameter(s)'});
 
-  const subjectRefs = req.query.subjectRefs?.split(',') || [];
-  const bodyRefs = req.query.bodyRefs?.split(',') || [];
+  const subjectRefs = req.query.subjectRefs && req.query.subjectRefs.split(',') || [];
+  const bodyRefs = req.query.bodyRefs && req.query.bodyRefs.split(',') || [];
   const email = req.query.email;
 
   const [err, accountData] = await to(collectronicsDriver.getAccountData(subjectRefs, bodyRefs, email));
