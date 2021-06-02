@@ -82,7 +82,7 @@ const fetchAccountDatas = async (refs, email) => {
 
   const apiEndpoint = process.env.COLLECTRONICS_API_URL;
 
-  if (refs && ReadableStreamDefaultController.length) {
+  if (refs && refs.length) {
     const responseDatas = [];
     // Note: intentionally firing off requests in sequence (rather than in parallel with Promise.all)
     // because Collectronics api returns internal server error if sent concurrent requests
