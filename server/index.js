@@ -1,4 +1,5 @@
 const express = require('express');
+const timeout = require('connect-timeout')
 
 const collectronicsDriver = require(`./drivers/collectronics`);
 
@@ -11,6 +12,9 @@ const AUTH_SECRET = process.env.AUTH_SECRET;
 const to = promise => promise.then(data => {
   return [null, data];
 }).catch(err => [err]);
+
+app.use(timeout('25s'));
+app.use(haltOnTimedout);
 
 // Static routes
 app.use(express.static(`${__dirname}/build/`));
@@ -40,5 +44,9 @@ app.get('/api/search', async (req, res) => {
 
   res.send({data: accountData});
 });
+
+function haltOnTimedout (req, res, next) {
+  if (!req.timedout) next()
+}
 
 app.listen(port, () => console.log(`Server listening on port ${port}`));
