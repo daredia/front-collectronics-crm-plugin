@@ -109,6 +109,12 @@ const fetchAccountDatas = async (refs, email) => {
 const getAccountData = async (subjectRefs, bodyRefs, email) => {
   console.log({msg: 'Fetching accounts', subjectRefs, bodyRefs});
 
+  // TODO(shez): replace this hack with a proper fix for the server timeout when multiple refs
+  // are found
+  if (subjectRefs.length + bodyRefs.length > 1) {
+    return accountDataResponseTypes.multiple;
+  }
+
   // If exactly 1 account is found from subjectRefs, return it
   const subjectRefSingleAccountDatas = await fetchAccountDatas(subjectRefs, null);
   if (subjectRefSingleAccountDatas.length == 1) {
