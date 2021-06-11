@@ -89,6 +89,7 @@ const fetchAccountDatas = async (refs, email) => {
     for (const ref of refs) {
       const queryString = `Ref=${ref}`;
       const response = await fetchAndValidate(`${apiEndpoint}?${queryString}`, encodedCredential);
+      console.log({ref, responseData: response.data});
       responseDatas.push(response.data);
     };
 
@@ -100,9 +101,11 @@ const fetchAccountDatas = async (refs, email) => {
     const queryString = `Email=${email}`;
     const response = await fetchAndValidate(`${apiEndpoint}?${queryString}`, encodedCredential);
     const accountData = formatAccountData(response.data);
+    console.log({accountDatas: [accountData]});
     return [accountData];
   }
 
+  console.log({accountDatas: []});
   return [];
 };
 
