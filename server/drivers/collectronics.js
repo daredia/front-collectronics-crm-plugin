@@ -114,7 +114,7 @@ const getAccountData = async (subjectRefs, bodyRefs, email) => {
 
   // TODO(shez): replace this hack with a proper fix for the server timeout when multiple refs
   // are found
-  if (subjectRefs.length + bodyRefs.length > 1) {
+  if (process.env.USE_MULTI_REFS_STOPGAP == 'true' && subjectRefs.length + bodyRefs.length > 1) {
     return accountDataResponseTypes.multiple;
   }
 
