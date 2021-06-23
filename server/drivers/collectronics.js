@@ -18,22 +18,38 @@ const accountDataResponseTypes = {
 };
 
 const fetchAndValidate = async (url, encodedCredential) => {
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Basic ${encodedCredential}`,
-    },
-  });
+  const timeout = 8000;
 
-  if (!response.ok && response.status !== 404)
-      throw Error(response.statusText);
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-  if (response.status === 404)
-    return ({});
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Basic ${encodedCredential}`,
+      },
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
 
-  const json = await response.json();
-  return json;
+    if (!response.ok && response.status !== 404)
+      throw Error(`Non-200 response when fetching ${url}: ${response.statusText}`);
+
+    if (response.status === 404)
+      return { data: [] };
+
+    const json = await response.json();
+    return json;
+  } catch (error) {
+    if (error.name == 'AbortError') {
+      console.error(`Request to ${url} timed out after ${timeout} milliseconds.`);
+      throw Error('Request timed out, please try again.');
+    } else {
+      throw Error(error);
+    }
+  }
 };
 
 const formatAccountData = (responseData) => {
@@ -111,12 +127,6 @@ const fetchAccountDatas = async (refs, email) => {
 
 const getAccountData = async (subjectRefs, bodyRefs, email) => {
   console.log({msg: 'Fetching accounts', subjectRefs, bodyRefs});
-
-  // TODO(shez): replace this hack with a proper fix for the server timeout when multiple refs
-  // are found
-  if (process.env.USE_MULTI_REFS_STOPGAP == 'true' && subjectRefs.length + bodyRefs.length > 1) {
-    return accountDataResponseTypes.multiple;
-  }
 
   // If exactly 1 account is found from subjectRefs, return it
   const subjectRefSingleAccountDatas = await fetchAccountDatas(subjectRefs, null);
