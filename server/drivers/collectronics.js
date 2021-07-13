@@ -1,6 +1,9 @@
-const base64 = require('base-64');
 const jsdom = require("jsdom");
-const fetch = require('node-fetch');
+const rp = require('request-promise');
+const fixieRequest = rp.defaults({'proxy': process.env.FIXIE_URL});
+
+const username = process.env.COLLECTRONICS_USERNAME;
+const pw = process.env.COLLECTRONICS_PW;
 
 const accountDataResponseTypes = {
   none: {
@@ -17,39 +20,21 @@ const accountDataResponseTypes = {
   }
 };
 
-const fetchAndValidate = async (url, encodedCredential) => {
-  const timeout = 8000;
+const fetchAndValidate = async (targetUrl) => {
+  return fixieRequest.get(targetUrl, {json: true, timeout: 8000}).auth(username, pw)
+    .then(res => {
+      return res;
+    })
+    .catch(err => {
+      if (err.code === 'ETIMEDOUT') {
+        console.error(`Request to ${targetUrl} timed out after 8000 milliseconds.`);
+        throw Error('Request timed out, please try again.');
+      }
 
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Basic ${encodedCredential}`,
-      },
-      signal: controller.signal,
+      console.log(`Request to ${targetUrl} failed, but did not timeout.`)
+      console.log(err);
+      throw Error(err);
     });
-    clearTimeout(timeoutId);
-
-    if (!response.ok && response.status !== 404)
-      throw Error(`Non-200 response when fetching ${url}: ${response.statusText}`);
-
-    if (response.status === 404)
-      return { data: [] };
-
-    const json = await response.json();
-    return json;
-  } catch (error) {
-    if (error.name == 'AbortError') {
-      console.error(`Request to ${url} timed out after ${timeout} milliseconds.`);
-      throw Error('Request timed out, please try again.');
-    } else {
-      throw Error(error);
-    }
-  }
 };
 
 const formatAccountData = (responseData) => {
@@ -92,10 +77,6 @@ const formatAccountData = (responseData) => {
 };
 
 const fetchAccountDatas = async (refs, email) => {
-  const username = process.env.COLLECTRONICS_USERNAME;
-  const pw = process.env.COLLECTRONICS_PW;
-  const encodedCredential = base64.encode(`${username}:${pw}`);
-
   const apiEndpoint = process.env.COLLECTRONICS_API_URL;
 
   if (refs && refs.length) {
@@ -104,7 +85,7 @@ const fetchAccountDatas = async (refs, email) => {
     // because Collectronics api returns internal server error if sent concurrent requests
     for (const ref of refs) {
       const queryString = `Ref=${ref}`;
-      const response = await fetchAndValidate(`${apiEndpoint}?${queryString}`, encodedCredential);
+      const response = await fetchAndValidate(`${apiEndpoint}?${queryString}`);
       console.log({ref, responseData: response.data});
       responseDatas.push(response.data);
     };
@@ -115,7 +96,7 @@ const fetchAccountDatas = async (refs, email) => {
 
   if (email) {
     const queryString = `Email=${email}`;
-    const response = await fetchAndValidate(`${apiEndpoint}?${queryString}`, encodedCredential);
+    const response = await fetchAndValidate(`${apiEndpoint}?${queryString}`);
     const accountData = formatAccountData(response.data);
     console.log({accountDatas: [accountData]});
     return [accountData];

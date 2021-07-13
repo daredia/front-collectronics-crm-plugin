@@ -16,7 +16,8 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.3"
+    "react-scripts": "3.4.3",
+    "request-promise": "^4.2.6"
   },
   "scripts": {
     "start": "HTTPS=true PORT=3000 react-scripts start",
