@@ -21,7 +21,7 @@ const accountDataResponseTypes = {
 };
 
 const fetchAndValidate = async (targetUrl) => {
-  return fixieRequest.get(targetUrl, {json: true, timeout: 8000}).auth(username, pw)
+  return fixieRequest.get(targetUrl, {json: true, timeout: 12000}).auth(username, pw)
     .then(res => {
       return res;
     })

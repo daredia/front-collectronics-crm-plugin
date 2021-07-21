@@ -13,7 +13,7 @@ const to = promise => promise.then(data => {
   return [null, data];
 }).catch(err => [err]);
 
-app.use(timeout('10s'));
+app.use(timeout('20s'));
 app.use(haltOnTimedout);
 
 // Static routes
